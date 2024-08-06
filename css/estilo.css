@@ -1,0 +1,142 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+body{
+    background-color: rgb(255, 255, 255);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+header{
+    background-color: black;
+    width: 100%;
+    height: 120px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+.nombrePagina{
+    font-family: "Edu VIC WA NT Beginner";
+    font-weight: 100;
+    font-style: normal;
+    font-size: 20px;
+    color: rgb(255, 255, 255);  
+}
+.contenedor{
+    display: flex;
+    flex-direction: column;
+    width: 1500px;
+    margin:50px;
+    background-color: rgba(8, 8, 8, 0.11);
+    border-radius: 20px;
+    height: auto;
+    padding: 20px;
+
+}
+.titulo{
+    padding: 20px;
+    text-align: center;
+    font-family: "Edu VIC WA NT Beginner";
+    font-weight: 700;
+    font-style: normal;
+    font-size: 30px;
+    text-align: center;
+    color: rgb(0, 0, 0);
+}
+.botones{
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px; 
+}
+.btn-relacionProducto{
+    border-radius: 15px;
+    border: 0;
+    margin: 5px;
+    padding: 10px;
+    background-color: rgb(255, 145, 0);
+    color: rgb(247, 247, 247);
+    
+}
+.productos{
+    display: flex;
+    align-items: center;
+    flex-direction: row;
+    justify-content: center;
+}
+.productoI{
+margin: 10px;
+background-color: rgb(0, 0, 0);
+text-align: center;
+border-radius: 18px;
+width: 200px;
+padding: 5px;
+color: rgb(247, 247, 247);
+}
+.producto-btn {
+    border-radius: 15px;
+    border: 0;
+    margin: 5px;
+    padding: 10px;
+    background-color: rgb(255, 145, 0);
+    color: rgb(247, 247, 247);
+}
+.venta-productos{
+    display: flex;
+    align-items: center;
+    flex-direction: column;
+    justify-content: center;
+
+}
+.venta-producto{
+    display: flex;
+    flex-direction: row;
+    margin: 10px;
+    background-color: rgb(255, 145, 0);
+    text-align: center;
+    border-radius: 20px;
+    justify-content: space-between;
+    color: rgb(247, 247, 247);
+    width: 90%;
+    padding: 5px;
+}
+.d-none{
+    display:none;
+}
+.venta-producto-btn {
+background-color: rgb(165, 41, 41);
+border: 1;
+border-radius: 20px;
+padding: .25rem;
+cursor: pointer;
+justify-content:end;
+
+}
+.total{
+    font-family: "Edu VIC WA NT Beginner";
+    font-weight: 400;
+    font-style: normal;
+    font-size: 20px;
+    color: rgb(0, 0, 0);
+    text-align: left;
+}
+footer {
+    width: 100%;
+    height: 150px;
+    background-color: rgb(0, 0, 0);
+    padding: 20px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.nombreFooter{
+    font-family: "Edu VIC WA NT Beginner";
+    font-weight: 300;
+    font-style: normal;
+    font-size: 30px;
+    text-align: center;
+    color: rgb(255, 255, 255);
+}

@@ -1,24 +1,57 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="es">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Juego los numeritos</title>
+    <title>Listado de productos para local</title>
+    <!--fuente no titulo-->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Edu+VIC+WA+NT+Beginner:wght@400..700&display=swap" rel="stylesheet">
+    <!--fuente titulo-->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Belanosima:wght@400;600;700&display=swap" rel="stylesheet">
+    <!--estilo-->
+    <link rel="stylesheet" href="./css/estilo.css">
 </head>
 <body>
-    <!--titulo-->
-    <h1>LOS NUMERITOS</h1>
-
-     <!--historia e instrucciones-->
-     <p>Estás por jugar a un juegazo, el cual me enseñó mi mamá como una forma de distraer a sus hijos en épocas de desesperación, viajes, salas de espera o vacaciones.</p>
-     <p>Te estarás preguntando cómo jugar... La mente maestra dentro de esta computadora va a pensar en 4 números, del 0 al 9, únicos y sin repetirse. Tú tienes que demostrar que eres más astuto que la computadora y adivinarlos, pero tranquilo, que te va a dar pistas.</p>
-     <p>Una vez que coloques los números, las pistas te dirán cuántos números son correctos y están colocados en su posición, cuántos números son correctos pero no están en su posición y cuántos son incorrectos.</p>
-
-    <input type="text" id="apuesta" maxlength="4">
-    <button onclick="iniciar()">Adivinar</button>
-    <p id="resultado"></p>
-    <!--js-->
+    <header id="arriba">
+        <div class="nombrePagina">
+            <h1>BASE DE DATOS ALVARITO MINISERVICE</h1>
+        </div>
+    </header>
+    <main class="main">
+        <section class="contenedor">
+            <h2 class="titulo">LISTADO DE PRODUCTOS</h2>
+            <section class="botones">
+                <button class="btn-relacionProducto" onclick="crearProducto()">Agregar Producto</button>
+                <button class="btn-relacionProducto" onclick="buscarProducto()">Buscar Producto</button>
+                <button class="btn-relacionProducto" onclick="mostrarProducto()">Mostrar Todos Productos</button>
+            </section>
+            <section class="productos" id="productos">
+            </section>     
+        </section>
+        <section class="contenedor">
+            <section class="venta">
+                <h2 class="titulo">VENTAS</h2>
+                <div id="carrito-vacio">
+                    <h4>El carrito está vacío</h4>
+                </div>
+                <div class="venta-productos" id="venta-productos">
+                </div>
+                <div class="total">
+                    <h2>TOTAL: <span id="totalCarrito"> $0 </span></h2>
+                </div>
+            </section>    
+        </section>         
+    </main>
+    <!--footer -->
+    <footer>
+        <div class="nombreFooter">   
+            <p>Alvarito Miniservice Productos</p>  
+         </div>  
+    </footer>
     <script src="./js/main.js"></script>
-    
 </body>
 </html>

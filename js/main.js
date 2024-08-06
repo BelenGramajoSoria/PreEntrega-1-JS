@@ -1,84 +1,117 @@
-// Solicitud al jugador que coloque su nombre
-let nombreJugador = prompt("Buenas jugador 🙋‍♀️, ¿Cómo te llamas?");
 
-// Solicitud al jugador que coloque su apellido 
-let apellido = prompt("¿Y tu apellido? 🤔");
+let datos = [];
+let carrito = [];
 
-// Verificar si alguno de los campos está vacío y solicitar el nombre nuevamente si es necesario
-if (nombreJugador === "" || apellido === "") {
-    nombreJugador = prompt("Seguro tenés un nombrecito, decímelo 🤪");
+// datos
+function crearProducto() {
+    let nombre = prompt("Escribi el nombre del producto:");
+    let marca = prompt("Marca del producto");
+    let precio = parseFloat(prompt("Precio del producto"));
+    let cantidad = parseInt(prompt("Cantidad de producto que posees"));
+    let vencimiento = prompt("Cual es la fecha de vencimiento?");
+
+    // sumar un producto
+    let producto = {
+        nombre: nombre,
+        marca: marca,
+        precio: precio,
+        cantidad: cantidad,
+        vencimiento: vencimiento
+    };
+
+    datos.push(producto);
+    alert("Agregado");
 }
 
-// Consola logueado
-console.log("El nombre del jugador es: " + nombreJugador + " " + apellido);
+// Buscar un prod
+function buscarProducto() {
+    let busqueda = prompt("Que producto buscas?");
+    let resultado = datos.filter(producto => producto.nombre.toLowerCase() === busqueda.toLowerCase());
 
-// Saludo e invitación a jugar
-alert("Hola, " + nombreJugador + " " + apellido + " Yo soy Belén, ¿jugamos? 😁");
-
-// Número aleatorio inventado por la compu
-function creaNumeroComputadora() {
-    let numeros = "";
-    while (numeros.length < 4) {
-        let numeroIndividual = Math.floor(Math.random() * 10);
-        if (!numeros.includes(numeroIndividual.toString())) {
-            numeros += numeroIndividual.toString();
-        }
+    if (resultado.length > 0) {
+        mostrarEnPantalla(resultado, 'productos');
+        alert(`Encontre ${resultado.length}`);
+    } else {
+        alert("No hay stock");
     }
-    return numeros;
 }
 
-// Contador de correctos y correctos pero no en su posición
-function DevolucionCorrectos(numJugador, numCompu) {
-    let correctosEnPosicion = 0;
-    let correctosNoPosicion = 0;
-
-    for (let i = 0; i < 4; i++) {
-        if (numJugador[i] === numCompu[i]) {
-            correctosEnPosicion++;
-        } else if (numCompu.includes(numJugador[i])) {
-            correctosNoPosicion++;
-        }
-    }
-
-    return { correctosEnPosicion, correctosNoPosicion };
-}
-
-let numCompu = creaNumeroComputadora();
-
-function iniciar() {
-    let numJugador = document.getElementById("apuesta").value;
-    let devolucion = document.getElementById("resultado");
-
-    if (numJugador.length !== 4 || new Set(numJugador).size !== 4 || isNaN(numJugador)) {
-        devolucion.innerText = "Peroooo..., te dije que un número de 4 dígitos sin repetirse.";
+// lista de productos cargads
+function mostrarProducto() {
+    if (datos.length === 0) {
+        alert("No hay productos cargados");
         return;
     }
 
-    let resultado = DevolucionCorrectos(numJugador, numCompu);
+    mostrarEnPantalla(datos, 'productos');
+}
 
-    // Devolución al jugador
-    devolucion.innerText = `Tenés ${resultado.correctosEnPosicion} correctos y en su lugar y tenés ${resultado.correctosNoPosicion} números correctos pero mal ubicados`;
+// Mostrar los productos 
+function mostrarEnPantalla(productos, elementoId) {
+    let listaProductos = document.getElementById(elementoId);
+    listaProductos.innerHTML = '';
 
-    if (resultado.correctosEnPosicion === 4) {
-        reiniciar();
+    productos.forEach(producto => {
+        let item = document.createElement('section');
+        item.className = 'productoI';
+        item.innerHTML = `
+            <h3>${producto.nombre}</h3>
+            <p>${producto.marca}</p>
+            <p>${producto.precio}</p>
+            <button class="producto-btn" onclick="agregarAlCarrito('${producto.nombre}')">Agregar al carrito</button>
+        `;
+        listaProductos.appendChild(item);
+    });
+}
+
+// Agregar productos al carrito
+function agregarAlCarrito(nombreProducto) {
+    let producto = datos.find(producto => producto.nombre.toLowerCase() === nombreProducto.toLowerCase());
+
+    if (producto) {
+        carrito.push(producto);
+        mostrarCarrito();
+        alert(`Agregaste ${producto.nombre} al carrito`);
+    } else {
+        alert("No hay stock");
     }
 }
 
-function reiniciar() {
-    let teGustoPrompt;
-    do {
-        teGustoPrompt = prompt("  ¡APA! Le ganaste a la compu, estás muy inteligente hoy 🤪🤪🤪 ¿Te gustó el juego? si o no? 🤪").toLowerCase();
-        if (teGustoPrompt === "si") {
-            alert("¡IUJUUUUUU! ¿Jugamos de nuevo?");
-            numCompu = creaNumeroComputadora();
-            break;
-        } else if (teGustoPrompt === "no") {
-            let noGusto = prompt("¿Estás seguro? 🤨").toLowerCase();
-            if (noGusto === "si") {
-                continue;
-            }
-        }
-    } while (teGustoPrompt !== "si");
-    iniciar();
+// Mostrar el carrito de ventas
+function mostrarCarrito() {
+    let carritoElement = document.getElementById('venta-productos');
+    carritoElement.innerHTML = '';
+
+    if (carrito.length === 0) {
+        document.getElementById('carrito-vacio').style.display = 'block';
+        return;
+    } else {
+        document.getElementById('carrito-vacio').style.display = 'none';
+    }
+
+    carrito.forEach((producto, index) => {
+        let item = document.createElement('div');
+        item.className = 'venta-producto';
+        item.innerHTML = `
+            <h3>${producto.nombre}</h3>
+            <p>${producto.marca}</p>
+            <p>${producto.precio}</p>
+            <button class="venta-producto-btn" onclick="eliminarDelCarrito(${index})">X</button>
+        `;
+        carritoElement.appendChild(item);
+    });
+
+    actualizarTotal();
 }
 
+// Función para eliminar productos del carrito
+function eliminarDelCarrito(index) {
+    carrito.splice(index, 1);
+    mostrarCarrito();
+}
+
+// Función para actualizar el total del carrito
+function actualizarTotal() {
+    let total = carrito.reduce((acc, producto) => acc + producto.precio * producto.cantidad, 0);
+    document.getElementById('totalCarrito').textContent = `$${total.toFixed(2)}`;
+}
