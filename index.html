@@ -25,9 +25,9 @@
         <section class="contenedor">
             <h2 class="titulo">LISTADO DE PRODUCTOS</h2>
             <section class="botones">
-                <button class="btn-relacionProducto" onclick="crearProducto()">Agregar Producto</button>
-                <button class="btn-relacionProducto" onclick="buscarProducto()">Buscar Producto</button>
-                <button class="btn-relacionProducto" onclick="mostrarProducto()">Mostrar Todos Productos</button>
+                <button class="relacionProducto" onclick="crearProducto()">Agregar Producto</button>
+                <button class="relacionProducto" onclick="mostrarProducto()">Mostrar Todos Productos</button>
+                <button class="relacionProducto" onclick="verVentas()">Ventas Realizadas</button>
             </section>
             <section class="productos" id="productos">
             </section>     
@@ -35,14 +35,16 @@
         <section class="contenedor">
             <section class="venta">
                 <h2 class="titulo">VENTAS</h2>
-                <div id="carrito-vacio">
+                <div id="carritoVacio">
                     <h4>El carrito está vacío</h4>
                 </div>
-                <div class="venta-productos" id="venta-productos">
+                <div class="ventaProductos" id="ventaProductos">
                 </div>
-                <div class="total">
-                    <h2>TOTAL: <span id="totalCarrito"> $0 </span></h2>
+                <div class="totalCarrito">
+                    <h2>TOTAL: <span id="total"> $0 </span></h2>
                 </div>
+                <!-- Botón para confirmar venta -->
+                <button class="relacionProducto" onclick="confirmarVenta()">Confirmar Venta</button>
             </section>    
         </section>         
     </main>
