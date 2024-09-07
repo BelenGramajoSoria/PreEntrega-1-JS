@@ -1,113 +1,102 @@
-// Importar librerías (en un proyecto real, usa un gestor de paquetes o incluye los scripts en el HTML)
-import Swal from 'sweetalert2';
-import Toastify from 'toastify-js';
+document.addEventListener('DOMContentLoaded', async () => {
+    await cargarProductos();
+});
 
-// Datos
 let datos = JSON.parse(localStorage.getItem('productos')) || [];
 let carrito = JSON.parse(localStorage.getItem('carrito')) || [];
 let ventas = JSON.parse(localStorage.getItem('ventas')) || [];
 
-// Datos iniciales
-const datosIniciales = [
-    { nombre: 'Producto1', marca: 'Marca1', precio: 100, cantidad: 10, vencimiento: '2024-12-31' },
-    { nombre: 'Producto2', marca: 'Marca2', precio: 200, cantidad: 5, vencimiento: '2024-11-30' },
-];
-if (datos.length === 0) {
-    datos = datosIniciales;
-    localStorage.setItem('productos', JSON.stringify(datos));
-}
-
-// Crear producto
+// Datos
 async function crearProducto() {
-    try {
-        const { value: nombre } = await Swal.fire({
-            title: 'Escribí el nombre del producto:',
-            input: 'text',
-            inputLabel: 'Nombre',
-            inputPlaceholder: 'Nombre del producto',
-        });
-        const { value: marca } = await Swal.fire({
-            title: 'Marca del producto',
-            input: 'text',
-            inputLabel: 'Marca',
-            inputPlaceholder: 'Marca del producto',
-        });
-        const { value: precio } = await Swal.fire({
-            title: 'Precio del producto (solo números)',
-            input: 'text',
-            inputLabel: 'Precio',
-            inputPlaceholder: 'Precio del producto',
-            inputValidator: (value) => {
-                if (isNaN(value)) return 'Solo números, por favor';
-            }
-        });
-        const { value: cantidad } = await Swal.fire({
-            title: 'Cantidad de producto en stock (solo números)',
-            input: 'text',
-            inputLabel: 'Cantidad',
-            inputPlaceholder: 'Cantidad en stock',
-            inputValidator: (value) => {
-                if (isNaN(value)) return 'Solo números, por favor';
-            }
-        });
-        const { value: vencimiento } = await Swal.fire({
-            title: 'Cuál es la fecha de vencimiento?',
-            input: 'text',
-            inputLabel: 'Vencimiento',
-            inputPlaceholder: 'Fecha de vencimiento',
-        });
-
-        if (nombre && marca && !isNaN(precio) && !isNaN(cantidad) && vencimiento) {
-            let producto = { nombre, marca, precio: parseFloat(precio), cantidad: parseInt(cantidad), vencimiento };
-            datos.push(producto);
-            localStorage.setItem('productos', JSON.stringify(datos));
-            Toastify({ text: "Producto agregado", duration: 3000 }).showToast();
-            mostrarProducto();
+    const { value: producto } = await Swal.fire({
+        title: 'Agregar Producto',
+        html: `
+            <input id="nombre" class="swal2-input" placeholder="Nombre">
+            <input id="marca" class="swal2-input" placeholder="Marca">
+            <input id="precio" class="swal2-input" type="number" placeholder="Precio" step="0.01">
+            <input id="cantidad" class="swal2-input" type="number" placeholder="Cantidad" min="1">
+            <input id="vencimiento" class="swal2-input" placeholder="Fecha de Vencimiento (dd-mm-yyyy)">
+        `,
+        focusConfirm: false,
+        confirmButtonText: 'Agregar',
+        preConfirm: () => {
+            return {
+                nombre: document.getElementById('nombre').value,
+                marca: document.getElementById('marca').value,
+                precio: parseFloat(document.getElementById('precio').value),
+                cantidad: parseInt(document.getElementById('cantidad').value),
+                vencimiento: document.getElementById('vencimiento').value
+            };
         }
-    } catch (error) {
-        console.error("Error al crear producto:", error);
+    });
+
+    if (producto) {
+        if (producto.nombre === '' || producto.marca === '' || isNaN(producto.precio) || isNaN(producto.cantidad) || producto.cantidad <= 0 || producto.vencimiento === '') {
+            Swal.fire('Error', 'Por favor complete todos los campos correctamente', 'error');
+            return;
+        }
+
+        // Agregar producto
+        datos.push(producto);
+        localStorage.setItem('productos', JSON.stringify(datos));
+        Swal.fire('Éxito', 'Producto agregado', 'success');
+
+        mostrarProducto();
     }
 }
 
 // Buscar un producto
 async function buscarProducto() {
-    try {
-        const { value: busqueda } = await Swal.fire({
-            title: '¿Qué producto buscas?',
-            input: 'text',
-            inputLabel: 'Buscar producto',
-            inputPlaceholder: 'Nombre del producto',
-        });
+    const { value: busqueda } = await Swal.fire({
+        title: 'Buscar Producto',
+        input: 'text',
+        inputPlaceholder: 'Escribe el nombre del producto',
+        inputAttributes: {
+            'aria-label': 'Escribe el nombre del producto'
+        },
+        confirmButtonText: 'Buscar',
+        showCancelButton: true,
+        cancelButtonText: 'Cancelar',
+    });
 
-        if (busqueda) {
-            let resultado = datos.filter(producto => producto.nombre.toLowerCase() === busqueda.toLowerCase());
+    if (busqueda) {
+        let resultado = datos.filter(producto => producto.nombre.toLowerCase() === busqueda.toLowerCase());
 
-            if (resultado.length > 0) {
-                mostrarEnPantalla(resultado, 'productos');
-                Swal.fire(`Encontré ${resultado.length}`);
-            } else {
-                Swal.fire("No hay stock");
-            }
+        if (resultado.length > 0) {
+            // Mostrar los productos encontrados
+            mostrarEnPantalla(resultado, 'productos');
+            Swal.fire({
+                title: `Encontré ${resultado.length} producto(s)`,
+                text: resultado.map(p => `${p.nombre} - ${p.marca} - $${p.precio}`).join('\n'),
+                icon: 'info'
+            });
+        } else {
+            Swal.fire('No hay stock', 'No se encontraron productos con ese nombre', 'info');
         }
-    } catch (error) {
-        console.error("Error al buscar producto:", error);
     }
 }
 
-// Lista de productos cargados
-async function mostrarProducto() {
+// Productos JSON
+async function cargarProductos() {
     try {
-        if (datos.length === 0) {
-            Swal.fire("No hay productos cargados");
-            return;
-        }
-        mostrarEnPantalla(datos, 'productos');
+        const response = await fetch('productos.json');
+        if (!response.ok) throw new Error('Error al cargar los productos');
+        datos = await response.json();
+        localStorage.setItem('productos', JSON.stringify(datos));
     } catch (error) {
-        console.error("Error al mostrar productos:", error);
+        console.error(error);
+        Swal.fire('Error', 'No se pudieron cargar los productos', 'error');
     }
 }
 
-// Mostrar los productos
+function mostrarProducto() {
+    if (datos.length === 0) {
+        Swal.fire('No hay productos', 'No hay productos cargados', 'info');
+        return;
+    }
+    mostrarEnPantalla(datos, 'productos');
+}
+
 function mostrarEnPantalla(productos, elementoId) {
     let listaProductos = document.getElementById(elementoId);
     listaProductos.innerHTML = '';
@@ -134,92 +123,90 @@ function mostrarEnPantalla(productos, elementoId) {
 
 // Editar producto
 async function editarProducto(index) {
-    try {
-        let producto = datos[index];
-        const { value: nuevoNombre } = await Swal.fire({
-            title: 'Nuevo nombre para el producto:',
-            input: 'text',
-            inputLabel: 'Nombre',
-            inputValue: producto.nombre,
-        });
-        const { value: nuevaMarca } = await Swal.fire({
-            title: 'Nueva marca del producto:',
-            input: 'text',
-            inputLabel: 'Marca',
-            inputValue: producto.marca,
-        });
-        const { value: nuevoPrecio } = await Swal.fire({
-            title: 'Nuevo precio del producto (solo números):',
-            input: 'text',
-            inputLabel: 'Precio',
-            inputValue: producto.precio,
-            inputValidator: (value) => {
-                if (isNaN(value)) return 'Solo números, por favor';
-            }
-        });
-        const { value: nuevaCantidad } = await Swal.fire({
-            title: 'Nueva cantidad del producto (solo números):',
-            input: 'text',
-            inputLabel: 'Cantidad',
-            inputValue: producto.cantidad,
-            inputValidator: (value) => {
-                if (isNaN(value)) return 'Solo números, por favor';
-            }
-        });
-        const { value: nuevaFechaVencimiento } = await Swal.fire({
-            title: 'Nueva fecha de vencimiento:',
-            input: 'text',
-            inputLabel: 'Vencimiento',
-            inputValue: producto.vencimiento,
-        });
+    let producto = datos[index];
+    const { value: nuevoNombre } = await Swal.fire({
+        title: 'Nuevo nombre para el producto:',
+        input: 'text',
+        inputValue: producto.nombre
+    });
 
-        if (nuevoNombre && nuevaMarca && !isNaN(nuevoPrecio) && !isNaN(nuevaCantidad) && nuevaFechaVencimiento) {
-            producto.nombre = nuevoNombre;
-            producto.marca = nuevaMarca;
-            producto.precio = parseFloat(nuevoPrecio);
-            producto.cantidad = parseInt(nuevaCantidad);
-            producto.vencimiento = nuevaFechaVencimiento;
+    const { value: nuevaMarca } = await Swal.fire({
+        title: 'Nueva marca del producto:',
+        input: 'text',
+        inputValue: producto.marca
+    });
 
-            localStorage.setItem('productos', JSON.stringify(datos));
-            mostrarProducto();
-        }
-    } catch (error) {
-        console.error("Error al editar producto:", error);
+    const { value: nuevoPrecio } = await Swal.fire({
+        title: 'Nuevo precio del producto (solo números):',
+        input: 'text',
+        inputValue: producto.precio
+    });
+
+    const { value: nuevaCantidad } = await Swal.fire({
+        title: 'Cantidad del producto (solo números):',
+        input: 'text',
+        inputValue: producto.cantidad
+    });
+
+    const { value: nuevaFechaVencimiento } = await Swal.fire({
+        title: 'Fecha de vencimiento:',
+        input: 'text',
+        inputValue: producto.vencimiento
+    });
+
+    let parsedPrecio = parseFloat(nuevoPrecio.replace(/[^0-9.]/g, ''));
+    let parsedCantidad = parseInt(nuevaCantidad.replace(/[^0-9]/g, ''));
+
+    if (isNaN(parsedPrecio) || isNaN(parsedCantidad)) {
+        Swal.fire('Error', 'Solo números, por favor', 'error');
+        return;
     }
+
+    datos[index] = {
+        nombre: nuevoNombre,
+        marca: nuevaMarca,
+        precio: parsedPrecio,
+        cantidad: parsedCantidad,
+        vencimiento: nuevaFechaVencimiento
+    };
+
+    localStorage.setItem('productos', JSON.stringify(datos));
+    Toastify({
+        text: "Producto actualizado",
+        duration: 3000,
+        gravity: "top",
+        position: "right",
+        backgroundColor: "#4CAF50",
+    }).showToast();
+    mostrarProducto();
 }
 
-// Agregar al carrito
-async function agregarAlCarrito(nombreProducto) {
-    try {
-        let producto = datos.find(producto => producto.nombre.toLowerCase() === nombreProducto.toLowerCase());
+// Productos al carrito 
+function agregarAlCarrito(nombreProducto) {
+    let producto = datos.find(producto => producto.nombre.toLowerCase() === nombreProducto.toLowerCase());
 
-        if (producto && producto.cantidad > 0) {
-            let productoCarrito = carrito.find(item => item.nombre.toLowerCase() === producto.nombre.toLowerCase());
+    if (producto && producto.cantidad > 0) {
+        let productoCarrito = carrito.find(item => item.nombre.toLowerCase() === producto.nombre.toLowerCase()); 
 
-            if (productoCarrito) {
-                productoCarrito.cantidad += 1;
-            } else {
-                carrito.push({
-                    ...producto,
-                    cantidad: 1
-                });
-            }
-            producto.cantidad -= 1;
-            localStorage.setItem('productos', JSON.stringify(datos));
-            localStorage.setItem('carrito', JSON.stringify(carrito));
-            mostrarCarrito();
-            Toastify({ text: "Producto agregado al carrito", duration: 3000 }).showToast();
+        if (productoCarrito) {
+            productoCarrito.cantidad += 1;
         } else {
-            Swal.fire("No hay stock disponible de este producto");
+            carrito.push({
+                ...producto,
+                cantidad: 1
+            });
         }
-    } catch (error) {
-        console.error("Error al agregar al carrito:", error);
+        producto.cantidad -= 1;
+        localStorage.setItem('productos', JSON.stringify(datos));
+        localStorage.setItem('carrito', JSON.stringify(carrito));
+        mostrarCarrito();
+    } else {
+        alert("No hay stock disponible de este producto");
     }
 }
 
-// Mostrar carrito
 function mostrarCarrito() {
-    let carritoElement = document.getElementById('ventaProductos');
+    let carritoElement = document.getElementById('ventaProductos'); 
     carritoElement.innerHTML = '';
 
     if (carrito.length === 0) {
@@ -241,139 +228,113 @@ function mostrarCarrito() {
                 ${producto.cantidad}
                 <button onclick="actualizarCantidad(${index}, 1)">+</button>
             </p>
-            <button class="BotonVP" onclick="eliminarDelCarrito(${index})">X</button>
+            <button onclick="eliminarDelCarrito(${index})">Eliminar</button>
         `;
         carritoElement.appendChild(item);
     });
+
     actualizarTotal();
 }
 
-// Actualizar cantidad
 function actualizarCantidad(index, cambio) {
-    let productoCarrito = carrito[index];
-    if (productoCarrito) {
-        if (cambio < 0 && productoCarrito.cantidad > 1) {
-            productoCarrito.cantidad += cambio;
-        } else if (cambio > 0) {
-            let productoOriginal = datos.find(producto => producto.nombre.toLowerCase() === productoCarrito.nombre.toLowerCase());
-            if (productoOriginal && productoOriginal.cantidad > 0) {
-                productoCarrito.cantidad += cambio;
-                productoOriginal.cantidad -= cambio;
-            }
-        }
-        localStorage.setItem('productos', JSON.stringify(datos));
-        localStorage.setItem('carrito', JSON.stringify(carrito));
-        mostrarCarrito();
-    }
-}
-
-// Eliminar del carrito
-function eliminarDelCarrito(index) {
-    let productoCarrito = carrito[index];
-    if (productoCarrito) {
-        let productoOriginal = datos.find(producto => producto.nombre.toLowerCase() === productoCarrito.nombre.toLowerCase());
-        if (productoOriginal) {
-            productoOriginal.cantidad += productoCarrito.cantidad;
-        }
-        carrito.splice(index, 1);
-        localStorage.setItem('productos', JSON.stringify(datos));
-        localStorage.setItem('carrito', JSON.stringify(carrito));
-        mostrarCarrito();
-    }
-}
-
-// Generar venta
-async function generarVenta() {
-    try {
-        if (carrito.length === 0) {
-            Swal.fire("No hay productos en el carrito");
-            return;
-        }
-        const { value: nombreCliente } = await Swal.fire({
-            title: 'Nombre del cliente',
-            input: 'text',
-            inputLabel: 'Nombre del cliente',
-        });
-        if (!nombreCliente) {
-            Swal.fire("Nombre del cliente es requerido");
-            return;
-        }
-        let total = carrito.reduce((sum, producto) => sum + (producto.precio * producto.cantidad), 0);
-        ventas.push({
-            nombreCliente,
-            productos: [...carrito],
-            total,
-            fecha: new Date().toLocaleDateString(),
-        });
-        localStorage.setItem('ventas', JSON.stringify(ventas));
-        carrito = [];
-        localStorage.setItem('carrito', JSON.stringify(carrito));
-        mostrarCarrito();
-        Swal.fire(`Venta generada. Total: $${total}`);
-    } catch (error) {
-        console.error("Error al generar venta:", error);
-    }
-}
-
-// Buscar ventas
-async function buscarVentas() {
-    try {
-        const { value: nombreCliente } = await Swal.fire({
-            title: 'Buscar ventas por cliente',
-            input: 'text',
-            inputLabel: 'Nombre del cliente',
-        });
-        if (!nombreCliente) {
-            Swal.fire("Nombre del cliente es requerido");
-            return;
-        }
-        let ventasCliente = ventas.filter(venta => venta.nombreCliente.toLowerCase() === nombreCliente.toLowerCase());
-        if (ventasCliente.length > 0) {
-            mostrarEnPantalla(ventasCliente, 'ventas');
-            Swal.fire(`Encontré ${ventasCliente.length} ventas`);
+    let producto = carrito[index];
+    if (producto) {
+        let nuevoCantidad = producto.cantidad + cambio;
+        if (nuevoCantidad <= 0) {
+            eliminarDelCarrito(index);
         } else {
-            Swal.fire("No se encontraron ventas para este cliente");
+            producto.cantidad = nuevoCantidad;
+            carrito[index] = producto;
+            localStorage.setItem('carrito', JSON.stringify(carrito));
+            mostrarCarrito();
         }
-    } catch (error) {
-        console.error("Error al buscar ventas:", error);
     }
+}
+
+function eliminarDelCarrito(index) {
+    carrito.splice(index, 1);
+    localStorage.setItem('carrito', JSON.stringify(carrito));
+    mostrarCarrito();
+}
+
+function actualizarTotal() {
+    let total = carrito.reduce((sum, producto) => sum + (producto.precio * producto.cantidad), 0);
+    document.getElementById('total').textContent = `$${total.toFixed(2)}`;
+}
+
+//Confirmar la venta
+function confirmarVenta() {
+    if (carrito.length === 0) {
+        Swal.fire('Carrito vacío', 'No puedes hacer una venta con el carrito vacío', 'info');
+        return;
+    }
+
+    const fecha = new Date().toLocaleDateString();
+    const totalVenta = carrito.reduce((sum, producto) => sum + (producto.precio * producto.cantidad), 0);
+
+    ventas.push({
+        fecha: fecha,
+        total: totalVenta,
+        productos: carrito.map(p => ({ nombre: p.nombre, cantidad: p.cantidad, precio: p.precio }))
+    });
+
+    localStorage.setItem('ventas', JSON.stringify(ventas));
+    localStorage.removeItem('carrito');
+    carrito = [];
+
+    Swal.fire('Venta confirmada', `Total de la venta: $${totalVenta.toFixed(2)}`, 'success');
+
+}
+
+// Ver ventas
+function verVentas() {
+    // Verificar si 'ventas' es un array
+    if (!Array.isArray(ventas)) {
+        Swal.fire({
+            title: 'Error',
+            text: 'Hubo un problema con el formato de las ventas.',
+            icon: 'error'
+        });
+        return;
+    }
+
+    // Verificar si el array de ventas tiene elementos
+    if (ventas.length === 0) {
+        Swal.fire({
+            title: 'No hay ventas realizadas',
+            icon: 'info'
+        });
+        return;
+    }
+
+    mostrarVentas();
 }
 
 // Mostrar ventas
 function mostrarVentas() {
-    let ventasElement = document.getElementById('ventas');
-    ventasElement.innerHTML = '';
+    let ventasHTML = '';
 
-    if (ventas.length === 0) {
-        Swal.fire("No hay ventas registradas");
-        return;
-    }
-
+    // Recorrer las ventas y construir el HTML
     ventas.forEach((venta, index) => {
-        let item = document.createElement('div');
-        item.className = 'venta';
-        item.innerHTML = `
-            <h3>Venta ${index + 1}</h3>
-            <p>Cliente: ${venta.nombreCliente}</p>
-            <p>Total: $${venta.total}</p>
-            <p>Fecha: ${venta.fecha}</p>
-            <h4>Productos:</h4>
-            <ul>
-                ${venta.productos.map(p => `<li>${p.nombre} - ${p.cantidad} x $${p.precio}</li>`).join('')}
-            </ul>
+        ventasHTML += `
+            <div class="ventaItem">
+                <h4>Venta ${index + 1}</h4>
+                <p>Fecha: ${venta.fecha}</p>
+                <p>Total: $${venta.total.toFixed(2)}</p>
+                <div>
+                    ${venta.productos.map(p => `
+                        <p>${p.nombre} - $${p.precio.toFixed(2)} x ${p.cantidad}</p>
+                    `).join('')}
+                </div>
+            </div>
         `;
-        ventasElement.appendChild(item);
+    });
+
+    // Mostrar ventas en un modal usando SweetAlert
+    Swal.fire({
+        title: 'Ventas Realizadas',
+        html: ventasHTML,
+        width: '600px',
+        showCloseButton: true
     });
 }
-
-// Eventos
-document.getElementById('crearProducto').addEventListener('click', crearProducto);
-document.getElementById('buscarProducto').addEventListener('click', buscarProducto);
-document.getElementById('mostrarProductos').addEventListener('click', mostrarProducto);
-document.getElementById('generarVenta').addEventListener('click', generarVenta);
-document.getElementById('buscarVentas').addEventListener('click', buscarVentas);
-document.getElementById('mostrarVentas').addEventListener('click', mostrarVentas);
-
-// Inicializar pantalla
-mostrarProducto();
-mostrarCarrito();
