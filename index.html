@@ -3,57 +3,30 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Listado de productos para local</title>
-    <!--fuente no titulo-->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Edu+VIC+WA+NT+Beginner:wght@400..700&display=swap" rel="stylesheet">
-    <!--fuente titulo-->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Belanosima:wght@400;600;700&display=swap" rel="stylesheet">
-    <!--estilo-->
-    <link rel="stylesheet" href="./css/estilo.css">
+    <title>Inventario</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css">
 </head>
 <body>
-    <header id="arriba">
-        <div class="nombrePagina">
-            <h1>BASE DE DATOS ALVARITO MINISERVICE</h1>
-        </div>
+    <header>
+        <h1>Gestión de Productos</h1>
+        <button id="crearProducto">Agregar Producto</button>
+        <button id="buscarProducto">Buscar Producto</button>
+        <button id="mostrarProductos">Mostrar Productos</button>
+        <button id="generarVenta">Generar Venta</button>
+        <button id="buscarVentas">Buscar Ventas</button>
+        <button id="mostrarVentas">Mostrar Ventas</button>
     </header>
-    <main class="main">
-        <section class="contenedor">
-            <h2 class="titulo">LISTADO DE PRODUCTOS</h2>
-            <section class="botones">
-                <button class="relacionProducto" onclick="crearProducto()">Agregar Producto</button>
-                <button class="relacionProducto" onclick="mostrarProducto()">Mostrar Todos Productos</button>
-                <button class="relacionProducto" onclick="verVentas()">Ventas Realizadas</button>
-            </section>
-            <section class="productos" id="productos">
-            </section>     
-        </section>
-        <section class="contenedor">
-            <section class="venta">
-                <h2 class="titulo">VENTAS</h2>
-                <div id="carritoVacio">
-                    <h4>El carrito está vacío</h4>
-                </div>
-                <div class="ventaProductos" id="ventaProductos">
-                </div>
-                <div class="totalCarrito">
-                    <h2>TOTAL: <span id="total"> $0 </span></h2>
-                </div>
-                <!-- Botón para confirmar venta -->
-                <button class="relacionProducto" onclick="confirmarVenta()">Confirmar Venta</button>
-            </section>    
-        </section>         
+
+    <main>
+        <div id="productos"></div>
+        <div id="ventaProductos"></div>
+        <div id="carritoVacio" style="display: none;">El carrito está vacío</div>
+        <div id="ventas"></div>
     </main>
-    <!--footer -->
-    <footer>
-        <div class="nombreFooter">   
-            <p>Alvarito Miniservice Productos</p>  
-         </div>  
-    </footer>
-    <script src="./js/main.js"></script>
+
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
+    <script src="main.js"></script>
 </body>
 </html>

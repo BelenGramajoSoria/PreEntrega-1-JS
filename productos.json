@@ -1,0 +1,31 @@
+[
+    {
+        "nombre": "Leche",
+        "marca": "La Serenisima",
+        "precio": 980,
+        "cantidad": 120,
+        "vencimiento": "15-11-2024"
+    },
+    {
+        "nombre": "Margarina",
+        "marca": "Don Yeyo",
+        "precio": 530,
+        "cantidad": 59,
+        "vencimiento": "02-08-2025"
+    },
+    {
+        "nombre": "Gaseosa",
+        "marca": "Coca Cola",
+        "precio": 1600,
+        "cantidad": 257,
+        "vencimiento": "22-12-2024"
+    },
+    {
+        "nombre": "Galleta",
+        "marca": "Oreo",
+        "precio": 680,
+        "cantidad": 83,
+        "vencimiento": "04-06-2025"
+    }
+
+]
